@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes WhatsApp</title>
+  <style>
+    body {
+      background-image: url('https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-position: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      backdrop-filter: brightness(0.92);
+    }
+    header {
+      background-color: rgba(0, 102, 204, 0.8);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+    }
+    input[type="file"] {
+      margin-right: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      margin-top: 10px;
+      padding: 15px;
+      border-left: 5px solid #0066cc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .card p {
+      margin: 4px 0;
+    }
+    .whats-button {
+      background-color: #25D366;
+      padding: 8px 12px;
+      color: white;
+      border: none;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💰 Lista de Clientes - Enviar WhatsApp</h1>
+</header>
+
+<div class="container">
+  <input type="file" id="arquivo" accept=".csv">
+  <button onclick="carregarClientes()">Começar</button>
+  <div id="clientes"></div>
+</div>
+
+<script>
+  function carregarClientes() {
+    const input = document.getElementById("arquivo");
+    const arquivo = input.files[0];
+    if (!arquivo) {
+      alert("Selecione um arquivo .csv");
+      return;
+    }
+
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+      const linhas = e.target.result.split("\n").filter(l => l.trim() !== "");
+      const container = document.getElementById("clientes");
+      container.innerHTML = "";
+
+      for (let i = 1; i < linhas.length; i++) {
+        const colunas = linhas[i].split(",");
+        if (colunas.length < 5) continue;
+
+        const cpf = colunas[0].trim();
+        const nome = colunas[1].trim();
+        const agencia = colunas[2].trim();
+        const conta = colunas[3].trim();
+        const celular = colunas[4].replace(/\D/g, '');
+
+        const msg = encodeURIComponent("ESTOU ENTRANDO EM CONTATO CONFORME NOSSO CADASTRO");
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <p>💸 <strong>Cliente ${i}</strong></p>
+          <p><strong>Nome:</strong> ${nome}</p>
+          <p><strong>CPF:</strong> ${cpf}</p>
+          <p><strong>Agência:</strong> ${agencia} | <strong>Conta:</strong> ${conta}</p>
+          <p><strong>Celular:</strong> ${celular}</p>
+          <button class="whats-button" onclick="window.open('https://wa.me/${celular}?text=${msg}', '_blank')">
+            Enviar WhatsApp
+          </button>
+        `;
+        container.appendChild(card);
+      }
+    };
+
+    leitor.readAsText(arquivo);
+  }
+</script>
+
+</body>
+</html>
